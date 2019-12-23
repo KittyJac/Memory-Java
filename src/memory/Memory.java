@@ -8,9 +8,10 @@ public class Memory {
     private Player player;
     private Grid grid;
     private Scanner scanner;
+    private boolean gameFinished;
 
     public Memory(Player player) {
-        this(player, new Grid(4,5));
+        this(player, new Grid(2,2));
     }
 
     public Memory(Player player, int width, int height){
@@ -23,6 +24,7 @@ public class Memory {
         this.player = player;
         this.grid = grid;
         this.scanner = new Scanner(System.in);
+        this.gameFinished = false;
     }
 
     public long getTimer() {
@@ -42,14 +44,19 @@ public class Memory {
     }
 
     public void start() {
-        checkForWin();
-        switch (state) {
-            case ONGOING:
-                handleOngoing();
-            case FINISHED:
-                handleFinished();
-            case HIGHSCORE:
-                handleHighscore();
+        while (!gameFinished) {
+            checkForWin();
+            switch (state) {
+                case ONGOING:
+                    handleOngoing();
+                    break;
+                case FINISHED:
+                    handleFinished();
+                    break;
+                case HIGHSCORE:
+                    handleHighscore();
+                    break;
+            }
         }
     }
 
@@ -59,22 +66,25 @@ public class Memory {
 
     private void drawEndScreen() {
         System.out.println("[CONGRATULATIONS! YOU WON!]");
+        gameFinished = true;
     }
 
     private void checkForWin() {
         if (grid.cardsGone()) {
-            setState(State.FINISHED);
+            state = State.FINISHED;
         }
     }
 
     private void handleOngoing() {
-        while (state == State.ONGOING) {
-            drawGameScreen();
-            if (grid.getAmountFlippedCards() == 2) {
-                grid.compareFlipped();
-
-            }
-            grid.flipCard(readCardCoords());
+        drawGameScreen();
+        if (grid.getAmountFlippedCards() == 2) {
+            grid.compareFlipped();
+        }
+        int[] cardCoords = readCardCoords();
+        if (cardCoords != null) {
+            grid.flipCard(cardCoords);
+        } else {
+            System.out.println("PLEASE TYPE IN TWO COORDINATES");
         }
     }
 
@@ -84,13 +94,20 @@ public class Memory {
 
     private int[] readCardCoords() {
         System.out.println("Which card would you like to flip? Enter XY-coordinates. (Example: 32)");
-        //TODO: check if array contains two ints
-        String[] cardCoordsString = scanner.nextLine().split("");
-        int[] cardCoordsInt = new int[2];
-        for (int i = 0; i < cardCoordsString.length; i++) {
-            cardCoordsInt[i] = Integer.parseInt(cardCoordsString[i]);
+        String cardCoordsString = scanner.nextLine();
+        if (cardCoordsString.matches("^[0-9]{2}$")) {
+            String[] cardCoordsStrings = cardCoordsString.split("");
+            int[] cardCoordsInt = new int[2];
+            cardCoordsInt[0] = Integer.parseInt(cardCoordsStrings[0]);
+            cardCoordsInt[1] = Integer.parseInt(cardCoordsStrings[1]);
+            if (cardCoordsInt[0] < grid.getWidth() && cardCoordsInt[1] < grid.getHeight()) {
+                for (int i = 0; i < cardCoordsStrings.length; i++) {
+                    cardCoordsInt[i] = Integer.parseInt(cardCoordsStrings[i]);
+                }
+                return cardCoordsInt;
+            }
         }
-        return cardCoordsInt;
+        return null;
     }
 
     private void handleFinished() { drawEndScreen();}

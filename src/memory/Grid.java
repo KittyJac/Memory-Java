@@ -43,8 +43,14 @@ public class Grid {
 
     public void flipCard(int[] cardCoords) {
         if (cards[cardCoords[1]][cardCoords[0]].isVisible()) {
-            cards[cardCoords[1]][cardCoords[0]].flip();
-            amountOfCardsFlipped++;
+            if (!(cards[cardCoords[1]][cardCoords[0]].isFlipped())) {
+                cards[cardCoords[1]][cardCoords[0]].flip();
+                amountOfCardsFlipped++;
+            } else {
+                System.out.println("CARD IS ALREADY FLIPPED");
+            }
+        } else {
+            System.out.println("CARD IS NOT VISIBLE");
         }
     }
 
@@ -61,10 +67,10 @@ public class Grid {
                 } else if (cards[i][j].isFlipped() && cardsFound == 1) {
                     if (cards[coord1][coord2].getValue() == cards[i][j].getValue()) {
                         removeCards(coord1, coord2, i, j);
-                    } else {
-                        cards[coord1][coord2].flip();
-                        cards[i][j].flip();
                     }
+                    cards[coord1][coord2].flip();
+                    cards[i][j].flip();
+
                 }
             }
         }
@@ -117,5 +123,13 @@ public class Grid {
             }
         }
         return true;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

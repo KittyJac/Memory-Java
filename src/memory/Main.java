@@ -7,7 +7,7 @@ public class Main {
         System.out.println("What is your name?");
         Scanner scanner = new Scanner(System.in);
         //String name = scanner.nextLine();
-        String name = "a";
+        String name = "tempname";
         Player player = new Player(name);
         Memory memory = new Memory(player);
 
